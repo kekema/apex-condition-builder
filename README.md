@@ -26,7 +26,7 @@ function(options)
 }
 ```
 
-The filters and the rules are defined in Page - Function and Global Variable Declaration:
+For the example, lets define the filters and the rules in: Page - Function and Global Variable Declaration:
 
 ```
 let cb = {};
@@ -213,6 +213,8 @@ For a description on the configuration options, see the [jQuery QueryBuilder doc
 In few places, an APEX extension is supported. For integer/double/date filter types, you can specify a formatMask. For filters with input 'select', instead of specifying values, you can reference an APEX item - which can be here an APEX item of type 'Select' or 'Popup LOV'. An approach can be to have these items in a hidden subregion:
 
 ![image](https://github.com/user-attachments/assets/616beacf-f14b-43af-81b7-abc24906689f)
+
+For any 'Popup LOV' item, configure the 'Display As' settings as 'Modal Dialog'.
 
 Now, you can add a 'Build' button to the region as to build the actual conditions:
 
