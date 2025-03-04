@@ -284,6 +284,17 @@ else
     apex.message.showPageSuccess( "Condition build succesfully" );
 }
 ```
+
+The region interface supports the following methods:
+
+create(options): can be used instead of the JavaScript Initialization Function (region attributes)<br>
+getRules(): get the condition definition. Calls queryBuilder.getRules()<br>
+setRules(rules, options): calls queryBuilder.setRules(rules, options)<br>
+validate(options): calls queryBuilder.validate(options)<br>
+reset(): calls queryBuilder.reset()<br>
+undo(): reverts the changes to last set undo point<br>
+setUndoPoint(): set undo point as used by undo()<br>
+
 <hr>
 
 This software uses:<br>
