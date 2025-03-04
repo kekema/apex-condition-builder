@@ -286,7 +286,7 @@ else
 ```
 <hr>
 
-This software uses:
+This software uses:<br>
 [jQuery QueryBuilder](https://querybuilder.js.org/api/), which is licensed under the MIT License.<br>
 Copyright (c) 2014-2018 Damien Sorel<br>
 [License](https://github.com/mistic100/jQuery-QueryBuilder/blob/dev/LICENSE) | [Project](https://github.com/mistic100/jQuery-QueryBuilder)
