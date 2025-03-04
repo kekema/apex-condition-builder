@@ -295,6 +295,8 @@ reset(): calls queryBuilder.reset()<br>
 undo(): reverts the changes to last set undo point<br>
 setUndoPoint(): set undo point as used by undo()<br>
 
+The LIB4X_CONDITION package supports 2 functions: build and evaluate. For more info, see the package inline documentation.
+
 <hr>
 
 This software uses:<br>
