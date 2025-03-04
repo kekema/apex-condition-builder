@@ -5,3 +5,6 @@ It has customizations for styling, incorporating of APEX components like Date Pi
 <p>
 <img src="./condition-builder.jpg" height="80%" width="80%">
 </p>
+<p>
+See this [blog item](https://karelekema.hashnode.dev/oracle-apex-condition-builder) for an overview of the functionality.  
+</p>
