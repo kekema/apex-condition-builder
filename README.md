@@ -249,15 +249,15 @@ The apex.region('cb_demo').getRules() calls the jQuery QueryBuilder getRules() A
 declare
     l_condition_rec lib4x_condition.t_condition_rec;
 begin
-    APEX_UTIL.SET_SESSION_STATE('P10_SERVER_ERROR', null);  
+    apex_util.set_session_state('P10_SERVER_ERROR', null);  
     l_condition_rec := lib4x_condition.build(:P10_DEFINITION, false, true);
-    APEX_UTIL.SET_SESSION_STATE('P10_DISPLAY_CONDITION', l_condition_rec.display_condition);
-    APEX_UTIL.SET_SESSION_STATE('P10_FILTER_CONDITION', l_condition_rec.filter_condition);
-    APEX_UTIL.SET_SESSION_STATE('P10_RULE_CONDITION', l_condition_rec.rule_condition);
-    APEX_UTIL.SET_SESSION_STATE('P10_PARAMETERS', l_condition_rec.display_params);
+    apex_util.set_session_state('P10_DISPLAY_CONDITION', l_condition_rec.display_condition);
+    apex_util.set_session_state('P10_FILTER_CONDITION', l_condition_rec.filter_condition);
+    apex_util.set_session_state('P10_RULE_CONDITION', l_condition_rec.rule_condition);
+    apex_util.set_session_state('P10_PARAMETERS', l_condition_rec.display_params);
 exception
     when others then
-        APEX_UTIL.SET_SESSION_STATE('P10_SERVER_ERROR', SQLERRM);
+        apex_util.set_session_state('P10_SERVER_ERROR', SQLERRM);
 end;
 ```
 
