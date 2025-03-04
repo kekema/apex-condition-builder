@@ -291,7 +291,7 @@ Copyright (c) 2014-2018 Damien Sorel<br>
 [License](https://github.com/mistic100/jQuery-QueryBuilder/blob/dev/LICENSE) | [Project](https://github.com/mistic100/jQuery-QueryBuilder)
 
 This software uses [interact.js](https://interactjs.io/), which is licensed under the MIT License.<br>
-Copyright (c) 2014-2018 Damien Sorel<br>
+Copyright (c) 2012-present Taye Adeyemi<br>
 [License](https://github.com/taye/interact.js/blob/main/LICENSE) | [Project](https://github.com/taye/interact.js)
 
 
