@@ -28,7 +28,7 @@
           "internalName" : "LIB4X.AXT.CONDITIONBUILDER",
           "type" : "region",
 	  "demo" : "https://apex.oracle.com/pls/apex/r/yola/demo/condition-builder",
-	  "previewImage" : "https://github.com/kekema/apex-condition-builder/blob/main/apex-condition-builder.jpg?raw=true"
+	  "previewImage" : "https://github.com/kekema/apex-condition-builder/blob/main/applicability-rule.jpg?raw=true"
         }
       }
     }
