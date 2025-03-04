@@ -216,6 +216,8 @@ In few places, an APEX extension is supported. For integer/double/date filter ty
 
 For any 'Popup LOV' item, configure the 'Display As' settings as 'Modal Dialog'.
 
+For rules, there is also a small extension: in case of rules where you reference an APEX item of type 'Popup LOV', or the rule has input by means of 'select', 'radio' or 'checkbox', the rule will have next to the value(s) also the displayValue(s). This is used to properly render a rule with 'Popup LOV' enabled, and to be able to compose human readable conditions (Display Conditions).
+
 Now, you can add a 'Build' button to the region as to build the actual conditions:
 
 ![image](https://github.com/user-attachments/assets/b48e4f44-ee30-4d9c-bdd4-857dbe8c98dc)
