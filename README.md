@@ -15,7 +15,8 @@ After importing the plugin, you can create a page with a new region, and select 
 
 Region Attributes:
 
-![image](https://github.com/user-attachments/assets/981b6100-f43a-4702-89d4-8fbb0ba10987)
+![image](https://github.com/user-attachments/assets/96e0722d-d8e7-4af7-a24b-a74ec3fd0d04)
+
 
 ```
 function(options)
@@ -208,7 +209,7 @@ cb.filters = [
     }                         
 ];
 ```
-For a description on the configuration options, see the [jQuery QueryBuilder documentation](https://querybuilder.js.org/index.html).
+For a description on the configuration options, see the [jQuery QueryBuilder documentation](https://querybuilder.js.org/index.html). The config can be set client-side like in above example, however it can also be done server-side using the Initialization PL/SQL Block. See the inline help for an example. 
 
 In few places, an APEX extension is supported. For integer/double/date filter types, you can specify a formatMask. For filters with input 'select', instead of specifying values, you can reference an APEX item - which can be here an APEX item of type 'Select' or 'Popup LOV'. An approach can be to have these items in a hidden subregion:
 
@@ -299,7 +300,11 @@ setUndoPoint(): set undo point as used by undo()<br>
 
 The LIB4X_CONDITION PL/SQL package supports 2 functions: build and evaluate. For more info, see the package inline documentation.
 
-<hr>
+<h3>Plugin versions</h3>
+Version 1.0.0 - build under APEX 24.1<br>
+Version 1.1.0 - build under APEX 24.2 - has the Initialization PL/SQL Block attribute added
+
+<h3>Third-Party Libraries and Licenses</h3>
 
 This software uses:<br>
 [jQuery QueryBuilder](https://querybuilder.js.org/api/), which is licensed under the MIT License.<br>
