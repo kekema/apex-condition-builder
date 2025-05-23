@@ -1,6 +1,6 @@
 {
     "name" : "Condition Builder",
-    "version" : "1.0.0",
+    "version" : "1.1.0",
     "description" : "Enabling to visually build logical conditions like filter- and rule conditions. #lib4x",
     "keywords" : ["Conditions", "Rules", "Filter"],
     "homepage" : "https://github.com/kekema/apex-condition-builder",
@@ -23,7 +23,7 @@
     "oracle" : {
       "versions": ["19.0.0.0"],	
       "apex" : {
-        "versions" : ["24.1"],
+        "versions" : ["24.2"],
         "plugin" : {
           "internalName" : "LIB4X.AXT.CONDITIONBUILDER",
           "type" : "region",
