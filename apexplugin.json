@@ -1,6 +1,6 @@
 {
     "name" : "Condition Builder",
-    "version" : "1.1.0",
+    "version" : "1.2.0",
     "description" : "Enabling to visually build logical conditions like filter- and rule conditions. #lib4x",
     "keywords" : ["Conditions", "Rules", "Filter"],
     "homepage" : "https://github.com/kekema/apex-condition-builder",
