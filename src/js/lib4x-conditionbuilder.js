@@ -11,6 +11,8 @@ lib4x.axt.conditionBuilder = (function($) {
     
     const C_LIB4X_CB = 'lib4x-cb';
     const C_LIB4X_CB_NUMBER = 'lib4x-cb-number';
+    const C_LIB4X_CB_LOV = 'lib4x-cb-lov';
+    const C_LIB4X_CB_LM_LIST = 'lib4x-cb-lm-list';
     const QB_EXT = '_qb';
     let undoPoint = {};
 
@@ -103,6 +105,7 @@ lib4x.axt.conditionBuilder = (function($) {
                 }      
             }); 
             qb$.on('getRuleValue.queryBuilder.filter', function(jQueryEvent, rule){
+                // for CB number input field, take into account any applied format mask
                 if (rule.$el.find('.rule-value-container input').hasClass(C_LIB4X_CB_NUMBER))
                 {
                     if (jQueryEvent.value)
@@ -126,6 +129,16 @@ lib4x.axt.conditionBuilder = (function($) {
                         }                        
                     }
                 }
+                // in case of a Popup LOV APEX reference item with multiple values (List Manager), 
+                // compose an array value from the list (select) options
+                let ruleList$ = rule.$el.find('.rule-value-container select');
+                if (ruleList$.hasClass(C_LIB4X_CB_LM_LIST))
+                {
+                    let returnNumbers = ((rule.filter.type == 'integer') || (rule.filter.type == 'double'));
+                    jQueryEvent.value = ruleList$.find('option').map(function() {
+                        return returnNumbers ? Number(this.value) : this.value;
+                    }).get()
+                }
             });
             qb$.on('jsonToRule.queryBuilder.filter', function(jQueryEvent, json){
                 // in case of a rule with LOV, also set the display value(s) in the rule
@@ -137,16 +150,36 @@ lib4x.axt.conditionBuilder = (function($) {
                     {
                         if (rule.operator.nb_inputs == 1) 
                         {
-                            let displayValue = json.displayValue;
-                            rule.$el.find('#' + rule.id + '_value_0_lov').val(displayValue);
+                            if (!rule.filter.multiple)
+                            {
+                                let displayValue = json.displayValue;
+                                rule.$el.find('#' + rule.id + '_value_0_lov').val(displayValue);
+                            }
+                            else
+                            {
+                                let ruleList$ = rule.$el.find('#' + rule.id + '_value_0_lm_list');
+                                ruleList$.empty();
+                                if (json.value && Array.isArray(json.value) && json.displayValue && Array.isArray(json.displayValue))
+                                {
+                                    for (let i = 0; i < json.value.length; i++) {
+                                        $('<option>', {
+                                            value: json.value[i],
+                                            text: json.displayValue[i]
+                                        }).appendTo(ruleList$);
+                                    }                                    
+                                }
+                            }
                         }
                         else if (rule.operator.nb_inputs > 1) 
                         {      
-                            for (let i = 0; i < rule.operator.nb_inputs; i++)
+                            if (!rule.filter.multiple)
                             {
-                                let displayValue = json.displayValue[i];
-                                rule.$el.find('#' + rule.id + '_value_' + i + '_lov').val(displayValue);
-                            }                                                    
+                                for (let i = 0; i < rule.operator.nb_inputs; i++)
+                                {
+                                    let displayValue = json.displayValue[i];
+                                    rule.$el.find('#' + rule.id + '_value_' + i + '_lov').val(displayValue);
+                                }  
+                            }                                                  
                         }                   
                     }
                 }              
@@ -170,16 +203,30 @@ lib4x.axt.conditionBuilder = (function($) {
                     {
                         if (rule.operator.nb_inputs == 1) 
                         {
-                            let displayValue = rule.$el.find('#' + rule.id + '_value_0_lov').val();
-                            jQueryEvent.value.displayValue = displayValue;
+                            if (!rule.filter.multiple)
+                            {
+                                let displayValue = rule.$el.find('#' + rule.id + '_value_0_lov').val();
+                                jQueryEvent.value.displayValue = displayValue;
+                            }
+                            else
+                            {
+                                let ruleList$ = rule.$el.find('#' + rule.id + '_value_0_lm_list');
+                                jQueryEvent.value.displayValue = ruleList$.find('option').map(function() {
+                                    return this.text;
+                                }).get()
+                                util.sortByDisplayValue(jQueryEvent.value);
+                            }
                         }
                         else if (rule.operator.nb_inputs > 1) 
                         {
-                            jQueryEvent.value.displayValue = [];
-                            for (let i = 0; i < rule.operator.nb_inputs; i++)
-                            {
-                                let displayValue = rule.$el.find('#' + rule.id + '_value_' + i + '_lov').val();
-                                jQueryEvent.value.displayValue[i] = displayValue;
+                            if (!rule.filter.multiple)
+                            {                            
+                                jQueryEvent.value.displayValue = [];
+                                for (let i = 0; i < rule.operator.nb_inputs; i++)
+                                {
+                                    let displayValue = rule.$el.find('#' + rule.id + '_value_' + i + '_lov').val();
+                                    jQueryEvent.value.displayValue[i] = displayValue;
+                                }
                             }
                         }                        
                     }
@@ -287,21 +334,68 @@ lib4x.axt.conditionBuilder = (function($) {
                 // An lov input has a related hidden apex lov item. Upon button click, we
                 // simulate the click on the hidden item as to open the lov dialog. 
                 // Upon lov item value change, we take the value and assign it to
-                // the rule input.
+                // the input element.
                 let lovItem = $(this).attr('lovitem');
                 let ruleLovId = $(this).attr('id').replace("_btn", "");
                 if (lovItem)
                 {
-                    apex.item(lovItem).element.off('change.lib4x-cb').on('change.lib4x-cb', function(jQueryEvent, data){
-                        let lovValue = apex.item(lovItem).getValue();
-                        let displayValue = apex.item(lovItem).displayValueFor(lovValue);
-                        // QB is listening to the change event as to set the value on the rule in the model.
-                        $('#'+ruleLovId+'_hiddenvalue').val(lovValue).trigger('change');
-                        $('#'+ruleLovId).val(displayValue);
-                    });
-                    apex.item(lovItem).element.next("button").click();
+                    // only go ahead to popup the LOV in case it is not set to multiple values - it should be single value only
+                    if (apex.item(lovItem).element.closest('.apex-item-group--popup-lov').find('.apex-item-multi').length == 0)
+                    {
+                        apex.item(lovItem).element.off('change.lib4x-cb').on('change.lib4x-cb', function(jQueryEvent, data){
+                            let lovValue = apex.item(lovItem).getValue();
+                            let displayValue = apex.item(lovItem).displayValueFor(lovValue);
+                            let ruleLovHidden$ = $('#'+ruleLovId+'_hiddenvalue');
+                            ruleLovHidden$.val(lovValue);
+                            if (ruleLovHidden$.hasClass(C_LIB4X_CB_LOV))
+                            {
+                                // QB is listening to the change event as to set the value on the rule in the model.
+                                ruleLovHidden$.trigger('change');
+                            }
+                            $('#'+ruleLovId).val(displayValue);
+                        });
+                        apex.item(lovItem).element.closest('.apex-item-group--popup-lov').find('.a-Button--popupLOV').click();
+                    }
+                    else
+                    {
+                        apex.debug.warn("LIB4X - Condition Builder: the APEX reference item (Popup LOV) should have 'Multiple Values' set to 'No'.");
+                    }
                 }
             });
+            // handle List Manager buttons clicks (Add, Remove)
+            qb$.on('click', '.a-Button--listManager', function(jQueryEvent, data){
+                let inputName = $(this).attr('lm-input-name');
+                let action = $(this).attr('lm-action');
+                let ruleLovId = inputName + '_lov';    
+                let ruleListId = inputName + '_lm_list';        
+                let ruleList$ = $('#'+ruleListId);    
+                if (action == 'ADD')
+                {
+                    let ruleLov$ = $('#'+ruleLovId);
+                    let displayValue = ruleLov$.val();
+                    let ruleLovHidden$ = $('#'+ruleLovId+'_hiddenvalue');
+                    let value = ruleLovHidden$.val();
+                    if (value)
+                    {
+                        // Add to the list
+                        if (ruleList$.find(`option[value="${value}"]`).length === 0) {
+                            ruleList$.append($('<option>', {
+                                value: value,
+                                text: displayValue,
+                                selected: false
+                            }));
+                            ruleList$.trigger('change');
+                        }
+                        ruleLovHidden$.val('');
+                        ruleLov$.val('');
+                    }
+                }
+                else if (action == 'REMOVE')
+                {
+                    $('#'+ ruleListId + ' option:selected').remove();
+                    ruleList$.trigger('change');
+                }
+            });                
             let qbOptions = options.queryBuilder;
             if (!qbOptions.plugins)
             {
@@ -402,7 +496,16 @@ lib4x.axt.conditionBuilder = (function($) {
         let createLovInput = function(rule, input_name)
         {
             let size = rule.filter.apex?.width ? rule.filter.apex.width : 25;
-            return '<div class="apex-item-group apex-item-group--popup-lov"><input type="hidden" name="' + input_name + '" id="' + input_name + '_lov_hiddenvalue"><input type="text" id="' + input_name + '_lov" class="apex-item-text apex-item-popup-lov" size="' + size + '" readonly role="combobox" aria-autocomplete="list" aria-expanded="false" aria-haspopup="dialog"><button type="button" class="a-Button a-Button--popupLOV" id="' + input_name + '_lov_btn" lovitem="' + rule.filter.apex.referenceItem + '"><span class="a-Icon icon-popup-lov"></span></button></div>';
+            // lov html, used for both rule.filter.multiple = true / false
+            let html = '<div class="apex-item-group apex-item-group--popup-lov"><input type="hidden" name="' + (rule.filter.multiple ? '' : input_name) + '" id="' + input_name + '_lov_hiddenvalue" ' + (rule.filter.multiple ? '' : 'class="' + C_LIB4X_CB_LOV + '"') + '><input type="text" id="' + input_name + '_lov" class="apex-item-text apex-item-popup-lov" size="' + size + '" style="width:100%" readonly role="combobox" aria-autocomplete="list" aria-haspopup="dialog"><button type="button" class="a-Button a-Button--popupLOV" id="' + input_name + '_lov_btn" lovitem="' + rule.filter.apex.referenceItem + '"><span class="a-Icon icon-popup-lov"></span></button></div>';
+            if (rule.filter.multiple)
+            {
+                // expand the html to a list manager; next html has the above lov html included
+                let addLabel = getMessage('LM.ADD');
+                let removeLabel = getMessage('LM.REMOVE');
+                html = '<fieldset id="' + input_name + '_lm_fieldset" class="listmanager apex-item-fieldset apex-item-fieldset--list-manager" tabindex="-1"><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tbody><tr><td>' + html + '</td><td><input type="button" value="' + addLabel + '" lm-input-name="' + input_name + '" lm-action="ADD" class="a-Button a-Button--listManager"><input type="button" value="' + removeLabel + '" lm-input-name="' + input_name + '" lm-action="REMOVE" class="a-Button a-Button--listManager"></td></tr><tr><td colspan="2"><select name="' + input_name + '" id="' + input_name + '_lm_list" class="listmanager ' + C_LIB4X_CB_LM_LIST + '" style="min-width:200px;max-width:500px;width:100%;" size="6" multiple="multiple"></select></td></tr></tbody></table></fieldset>';                
+            }
+            return html;
         }
 
         /*
@@ -541,6 +644,20 @@ lib4x.axt.conditionBuilder = (function($) {
                 }     
                 return dateFormat;           
             }
+        },
+        sortByDisplayValue: function(ruleValue)
+        {
+            // ruleValue has value and displayValue properties
+            // create a combined array of objects
+            let combined = ruleValue.displayValue.map((displayValue, index) => ({
+                displayValue: displayValue,
+                value: ruleValue.value[index]
+            }));
+            // sort the combined array by displayValue
+            combined.sort((a, b) => a.displayValue.localeCompare(b.displayValue));
+            // split back into parallel arrays
+            ruleValue.displayValue = combined.map(item => item.displayValue);
+            ruleValue.value        = combined.map(item => item.value);            
         }
     };     
     
@@ -548,31 +665,34 @@ lib4x.axt.conditionBuilder = (function($) {
     {
         // here we can have the labels and messages for which the developer should be 
         // able to config translations in APEX
-        // currently, no labels or messages are applicable
         // example:
         /*apex.lang.addMessages({
             'LIB4X.CB.COL_EXP_GRP': 'Collapse/Expand Groups',
             'LIB4X.CB.COL_GRP': 'Collapse Groups',
             'LIB4X.CB.EXP_GRP': 'Expand Groups',
             'LIB4X.CB.Q_VAL_ERR_CLOSE_DIALOG': 'Data has validation errors. Close Dialog?'
-        });*/      
+        });*/   
+        apex.lang.addMessages({   
+            'LIB4X.CB.LM.ADD': 'Add',  // List Manager
+            'LIB4X.CB.LM.REMOVE': 'Remove',
+        });            
     }
 
     function getMessage(key) {
-        return apex.lang.getMessage('LIB4X.RB.' + key);
+        return apex.lang.getMessage('LIB4X.CB.' + key);
     }    
 
     /*
      * Main plugin init function
      */
-    let init = function(cbStaticId, initFunc)
+    let init = function(cbStaticId, qbConfig, initFunc)
     {
         initMessages();
         let cbStaticIdQb = cbStaticId + QB_EXT;
         // tag the region as being a CB
         $('#'+cbStaticId).addClass(C_LIB4X_CB);
-        let options = {};     
-        options.queryBuilder = {};
+        let options = {};  
+        options.queryBuilder = qbConfig ? qbConfig : {};
         if (initFunc)
         {
             // call init function
@@ -637,9 +757,8 @@ lib4x.axt.conditionBuilder = (function($) {
                 undoPoint[cbStaticId] = this.widget().queryBuilder('getRules');
             }     
         });   
-        // if options have been given via the init func and filters are known,
-        // call initQB. Else, the CB can be created later by calling region create method.
-        if (options.queryBuilder?.filters)
+        // if filters are known, call initQB. Else, the CB can be created later by calling region create method.
+        if (options?.queryBuilder?.filters)
         {  
             queryBuilderModule.initQB(cbStaticId, cbStaticIdQb, options);
         }
