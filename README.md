@@ -215,7 +215,9 @@ In few places, an APEX extension is supported. For integer/double/date filter ty
 
 ![image](https://github.com/user-attachments/assets/616beacf-f14b-43af-81b7-abc24906689f)
 
-For any 'Popup LOV' item, configure the 'Display As' settings as 'Modal Dialog'.
+For any 'Popup LOV' item, configure the 'Display As' settings as 'Modal Dialog'. In addition, leave the 'Multiple Values' setting to 'No'. In case you want to enable multiple values, you can do so via the jQuery QueryBuilder [filter attribute](https://querybuilder.js.org/#filters) 'multiple' by setting that one to true. This will extend the Popup LOV field and make it a list manager:
+
+![image](https://github.com/user-attachments/assets/b6ad9b07-e11d-4ca8-b41e-881c6d695496)
 
 For rules, there is also a small extension: in case of rules where you reference an APEX item of type 'Popup LOV', or the rule has input by means of 'select', 'radio' or 'checkbox', the rule will have next to the value(s) also the displayValue(s). This is used to properly render a rule with 'Popup LOV' enabled, and to be able to compose human readable conditions (Display Conditions).
 
@@ -302,7 +304,8 @@ The LIB4X_CONDITION PL/SQL package supports 2 functions: build and evaluate. For
 
 <h3>Plugin versions</h3>
 Version 1.0.0 - build under APEX 24.1<br>
-Version 1.1.0 - build under APEX 24.2 - has the Initialization PL/SQL Block attribute added
+Version 1.1.0 - build under APEX 24.2 - has the Initialization PL/SQL Block attribute added<br>
+Version 1.2.0 - build under APEX 24.2 - implements the QueryBuilder 'multiple' filter attribute for rule inputs where a Popup LOV is used by applying a List Manager
 
 <h3>Third-Party Libraries and Licenses</h3>
 
