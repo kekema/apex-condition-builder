@@ -219,6 +219,48 @@ For any 'Popup LOV' item, configure the 'Display As' settings as 'Modal Dialog'.
 
 ![image](https://github.com/user-attachments/assets/b6ad9b07-e11d-4ca8-b41e-881c6d695496)
 
+Another extension is enabling a link to a lookup page by clicking on an icon next to the rule:
+
+<img width="420" height="42" alt="image" src="https://github.com/user-attachments/assets/d865cde2-fe69-4814-9249-25fa837a6de6" />
+
+This might be a page with additional info or drilldown on the rule (value). You can configure as a url to a regular webpage, or you can configure an APEX page to be opened. The filter id and rule value can be used to substitute placeholders.
+You can configure the lookup as part of a filter definition, eg:
+
+```
+    {
+        id: 'category',
+        label: 'Category',
+        type: 'integer',
+        input: 'select',
+        multiple: false,
+        values: {
+            1: 'Books',
+            2: 'Movies',
+            3: 'Music',
+            4: 'Tools',
+            5: 'Goodies',
+            6: 'Clothes'
+        },
+        operators: ['equal', 'not_equal', 'in', 'not_in', 'between', 'is_null', 'is_not_null'],
+        apex:{
+            lookup:{
+                icon: 'fa fa-info-square-o',  // optional, default is 'fa fa-info-square-o'
+                // Either configure a url:     
+                url: 'https://www.google.com/search?q={filter.id}+{rule.value}',
+                target: 'myPopup',    // optional, default is '_blank'
+                windowFeatures: 'left=100,top=100,width=1000,height=750',    // optional
+                // the url will be opened with window.open(url, target, windowFeatures)
+                // OR: configure a pageId:
+                pageId:78,
+                itemNames:['P78_FILTER_ID', 'P78_RULE_VALUE'], // optional
+                itemValues:['{filter.id}', '{rule.value}']     // optional
+                // the page will be opened using apex.navigation.openInNewWindow(url), which opens in a new tab
+                // in the target page, have 'Page Access Protection' as 'unrestricted' so no checksum is required           
+            }
+        }
+    }
+```
+
 For rules, there is also a small extension: in case of rules where you reference an APEX item of type 'Popup LOV', or the rule has input by means of 'select', 'radio' or 'checkbox', the rule will have next to the value(s) also the displayValue(s). This is used to properly render a rule with 'Popup LOV' enabled, and to be able to compose human readable conditions (Display Conditions).
 
 Now, you can add a 'Build' button to the region as to build the actual conditions:
