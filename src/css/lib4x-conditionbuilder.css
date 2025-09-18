@@ -132,7 +132,7 @@
     border-radius: 3px;
 }
   
-.query-builder .fa {
+.query-builder .fa:not(.no-reset) {
     vertical-align: unset;
     font-size: unset;
 }
@@ -163,4 +163,10 @@
     cursor: unset;
     color: var(--a-palette-danger);
 }
-  
+
+.query-builder .rule-container .lookup-container {
+  display: inline-block;
+  margin: 0 5px 0 0;
+  vertical-align: middle;
+  line-height: 1;
+}
