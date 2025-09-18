@@ -19,7 +19,30 @@ lib4x.axt.conditionBuilder = (function($) {
     let queryBuilderModule = (function() 
     {
         let initQB = function(cbStaticId, cbStaticIdQb, options) {
-            let qb$ = $('#' + cbStaticIdQb);          
+            let qb$ = $('#' + cbStaticIdQb);  
+            qb$.on("afterUpdateRuleFilter.queryBuilder", (jQueryEvent, rule) => {   
+                // in case a lookup is configured in the filter definition, add a 
+                // lookup-container (with link) as child of the rule container
+                let ruleContainer$ = rule.$el;
+                let lookupDefined = rule.filter?.apex?.lookup?.url || rule.filter?.apex?.lookup?.pageId;
+                if (lookupDefined)
+                {
+                    let icon = rule.filter?.apex?.lookup?.icon || 'fa fa-info-square-o';
+                    let lookupContainer$ = $('<div class="lookup-container"><a href="dummy"><span class="no-reset ' + icon + '"></span></a></div>');
+                    let existingContainer$ = ruleContainer$.children('.lookup-container');
+                    existingContainer$.length ? existingContainer$.replaceWith(lookupContainer$) : ruleContainer$.append(lookupContainer$);  
+                    // on click of the dummy link, we handle the opening of the lookup ourselves as per the lookup configuration
+                    lookupContainer$.find('a').on('click', function(jQueryEvent){
+                        utilityModule.openLookup(rule);
+                        // prevent default since we opened ourselves                          
+                        return false;
+                    })
+                } 
+                else
+                {
+                    ruleContainer$.children('.lookup-container').remove();
+                }             
+            });                             
             qb$.on("afterInit.queryBuilder", (jQueryEvent) => { 
                 let filters = qb$[0].queryBuilder.settings.filters;
                 filters.forEach((filter)=>{
@@ -90,7 +113,7 @@ lib4x.axt.conditionBuilder = (function($) {
                     html.value = $($.parseHTML(html.value)[0]).append($('#'+ rule.filter.apex.referenceItem + ' > option').clone())[0].outerHTML;
                 }
             });             
-            qb$.on('getRuleInput.queryBuilder.filter', function(html, rule, name){
+            qb$.on('getRuleInput.queryBuilder.filter', function(html, rule, name){              
                 if (rule.filter.input == 'text')
                 {
                     html.value = html.value.replace('form-control', 'form-control apex-item-text');
@@ -140,7 +163,7 @@ lib4x.axt.conditionBuilder = (function($) {
                     }).get()
                 }
             });
-            qb$.on('jsonToRule.queryBuilder.filter', function(jQueryEvent, json){
+            qb$.on('jsonToRule.queryBuilder.filter', function(jQueryEvent, json){    
                 // in case of a rule with LOV, also set the display value(s) in the rule
                 let rule = jQueryEvent.value;
                 if (rule.filter?.apex?.referenceItem)
@@ -184,7 +207,7 @@ lib4x.axt.conditionBuilder = (function($) {
                     }
                 }              
             });
-            qb$.on('ruleToJson.queryBuilder.filter', function(jQueryEvent, rule){
+            qb$.on('ruleToJson.queryBuilder.filter', function(jQueryEvent, rule){           
                 // include the label
                 jQueryEvent.value.label = rule.filter.label ? rule.filter.label : rule.filter.field;
                 // in case of in operator with type string, the splitted values might have leading/trailing spaces to be trimmed 
@@ -283,7 +306,7 @@ lib4x.axt.conditionBuilder = (function($) {
                     }
                 }                
             });         
-            qb$.on('ruleToSQL.queryBuilder.filter', function(expression, rule, value, valueWrapper){
+            qb$.on('ruleToSQL.queryBuilder.filter', function(expression, rule, value, valueWrapper){          
                 // add Oracle specific syntax elements
                 if (rule?.type.includes('date'))
                 {
@@ -312,14 +335,14 @@ lib4x.axt.conditionBuilder = (function($) {
                     }
                 }
             });
-            qb$.on('groupToJson.queryBuilder.filter', function(jQueryEvent, group){
+            qb$.on('groupToJson.queryBuilder.filter', function(jQueryEvent, group){       
                 // for the root group, add the default date format
                 if (group.id == group.model.root.id)
                 {
                     jQueryEvent.value.dateFormat = util.locale.getDateFormat();
                 }
             });                 
-            qb$.on('change', '.'+C_LIB4X_CB_NUMBER, function(jQueryEvent, data){
+            qb$.on('change', '.'+C_LIB4X_CB_NUMBER, function(jQueryEvent, data){ 
                 let formatMask = $(this).attr('data-format');
                 if (formatMask)
                 {
@@ -618,12 +641,82 @@ lib4x.axt.conditionBuilder = (function($) {
             });             
         }
 
+        // open the APEX page or url as per the configuration in rule.filter.apex.lookup
+        // substitute any rule value placeholder with the rule value and 
+        // any filter id placeholder with the filter id
+        function openLookup(rule) {
+            let ruleValue = rule.value;
+            // take only primitives into account
+            if (!isSimpleValue(ruleValue))
+            {
+                ruleValue = '';
+            }
+            let filterId = rule.filter.id || '';    
+            let url = null;
+            // if page is configured, go for it, else go for url
+            let pageId = rule.filter.apex.lookup.pageId;
+            if (pageId)
+            {
+                let itemValues = rule.filter.apex.lookup.itemValues ? [...rule.filter.apex.lookup.itemValues] : null;
+                if (itemValues)
+                {
+                    for (let itemValue in itemValues)
+                    {
+                        itemValues[itemValue] = substitutePlaceholders(itemValues[itemValue], ruleValue, filterId);
+                    }
+                }
+                url = apex.util.makeApplicationUrl({
+                        pageId:pageId,
+                        itemNames:rule.filter.apex.lookup.itemNames, 
+                        itemValues:itemValues
+                    });                
+            }
+            else
+            {
+                url = rule.filter.apex.lookup.url;
+                url = substitutePlaceholders(url, ruleValue, filterId);
+            }
+            if (pageId)
+            {
+                apex.navigation.openInNewWindow(url);
+            }
+            else
+            {
+                if (url)
+                {
+                    let target = rule.filter.apex.lookup.target || '_blank';
+                    let handle = window.open(url, target, rule.filter.apex.lookup.windowFeatures);      
+                    if (!handle)
+                    {
+                        // might be  blocked by a popup blocker
+                        // just open default
+                        window.open(url, '_blank');   
+                    }   
+                }   
+            }
+        }        
+
+        function isSimpleValue(val) {
+            return (val === null) || (typeof val !== "object" && typeof val !== "function");
+        }
+
+        function substitutePlaceholders(template, ruleValue, filterId)
+        {
+            if (template)
+            {
+                template = template.replace("{rule.value}", encodeURIComponent(ruleValue));
+                template = template.replace("{filter.id}", encodeURIComponent(filterId));
+            }
+            return template;
+        }
+
         return{
             createDateInput: createDateInput,
             createNumberInput: createNumberInput,
             createLovInput: createLovInput,
             validateDateValue: validateDateValue,
-            enableInlineDialogOverlay: enableInlineDialogOverlay
+            enableInlineDialogOverlay: enableInlineDialogOverlay,
+            openLookup: openLookup
         }        
     })();
 
