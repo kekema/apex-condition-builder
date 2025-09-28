@@ -57,13 +57,18 @@
     background-color: var(--u-color-16);
     border-color: #2E6DA4;
 }
+
+.query-builder .btn-success {
+    opacity: 0.85;
+}
   
 .query-builder .btn-danger {
-    border-color: #cb1100;  
+    border-color: #cb11008e;
     /*--a-button-border-color: #cb1100;*/
     --a-button-background-color: transparent;
     --a-button-text-color: #a64940;
-    --a-button-hover-text-color: #fff  
+    --a-button-hover-text-color: #fff;
+    opacity: 0.9;
 }
   
 .query-builder .btn-success.active, .query-builder .btn-success.focus,
@@ -72,6 +77,7 @@
     color: #FFF;
     background-color: #666;
     border-color: #2e3439;
+    opacity: 0.85;
 }
   
 .query-builder .btn-primary.active, .query-builder .btn-primary.focus,
@@ -89,6 +95,7 @@
     color: #FFF;
     background-color: var(--u-color-39);
     border-color: #AC2925;
+    opacity: 0.85;    
 }
   
 .query-builder .btn-group {
@@ -128,13 +135,14 @@
 .query-builder .btn-sm, .query-builder .btn-group-sm > .btn {
     padding: 1px 5px;
     font-size: 12px;
-    line-height: 1.5;
+    line-height: 1.7;
     border-radius: 3px;
 }
   
 .query-builder .fa:not(.no-reset) {
     vertical-align: unset;
     font-size: unset;
+    line-height: unset;
 }
   
 .query-builder .rules-group-container{
