@@ -11,11 +11,11 @@ See this [blog item](https://karelekema.hashnode.dev/oracle-apex-condition-build
 After importing the plugin, you can create a page with a new region, and select 'LIB4X - Condition Builder' as the region type:
 </p>
 
-![image](https://github.com/user-attachments/assets/052d71a5-9daf-4ad2-ad9d-dc5dfd6449da)
+<img width="50%" height="50%" alt="image" src="https://github.com/user-attachments/assets/052d71a5-9daf-4ad2-ad9d-dc5dfd6449da" />
 
 Region Attributes:
 
-![image](https://github.com/user-attachments/assets/96e0722d-d8e7-4af7-a24b-a74ec3fd0d04)
+<img width="50%" height="50%" alt="image" src="https://github.com/user-attachments/assets/96e0722d-d8e7-4af7-a24b-a74ec3fd0d04" />
 
 
 ```
