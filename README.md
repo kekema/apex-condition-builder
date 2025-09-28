@@ -213,15 +213,15 @@ For a description on the configuration options, see the [jQuery QueryBuilder doc
 
 In few places, an APEX extension is supported. For integer/double/date filter types, you can specify a formatMask. For filters with input 'select', instead of specifying values, you can reference an APEX item - which can be here an APEX item of type 'Select' or 'Popup LOV'. An approach can be to have these items in a hidden subregion:
 
-![image](https://github.com/user-attachments/assets/616beacf-f14b-43af-81b7-abc24906689f)
+<img width="25%" height="25%" alt="image" src="https://github.com/user-attachments/assets/616beacf-f14b-43af-81b7-abc24906689f" />
 
 For any 'Popup LOV' item, configure the 'Display As' settings as 'Modal Dialog'. In addition, leave the 'Multiple Values' setting to 'No'. In case you want to enable multiple values, you can do so via the jQuery QueryBuilder [filter attribute](https://querybuilder.js.org/#filters) 'multiple' by setting that one to true. This will extend the Popup LOV field and make it a list manager:
 
-![image](https://github.com/user-attachments/assets/b6ad9b07-e11d-4ca8-b41e-881c6d695496)
+<img width="70%" height="70%" alt="image" src="https://github.com/user-attachments/assets/b6ad9b07-e11d-4ca8-b41e-881c6d695496" />
 
 Another extension is enabling a link to a lookup page by clicking on an icon next to the rule:
 
-<img width="420" height="42" alt="image" src="https://github.com/user-attachments/assets/d865cde2-fe69-4814-9249-25fa837a6de6" />
+<img width="30%" height="30%" alt="image" src="https://github.com/user-attachments/assets/d865cde2-fe69-4814-9249-25fa837a6de6" />
 
 This might be a page with additional info or drilldown on the rule (value). You can configure as a url to a regular webpage, or you can configure an APEX page to be opened. The filter id and rule value can be used to substitute placeholders.
 You can configure the lookup as part of a filter definition, eg:
@@ -265,7 +265,7 @@ For rules, there is also a small extension: in case of rules where you reference
 
 Now, you can add a 'Build' button to the region as to build the actual conditions:
 
-![image](https://github.com/user-attachments/assets/b48e4f44-ee30-4d9c-bdd4-857dbe8c98dc)
+<img width="25%" height="25%" alt="image" src="https://github.com/user-attachments/assets/b48e4f44-ee30-4d9c-bdd4-857dbe8c98dc" />
 
 First JavaScript action:
 
@@ -308,7 +308,7 @@ exception
 end;
 ```
 
-![image](https://github.com/user-attachments/assets/6efbbc6d-b388-4915-bfbc-0d749d3efe83)
+<img width="70%" height="70%" alt="image" src="https://github.com/user-attachments/assets/6efbbc6d-b388-4915-bfbc-0d749d3efe83" />
 
 The pl/sql code is in the LIB4X_CONDITION package. The source you find in the src/plsql folder.
 
